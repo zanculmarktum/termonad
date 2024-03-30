@@ -89,6 +89,7 @@ import GI.Gtk
   , widgetSetHexpand
   , widgetShow
   , windowSetFocus
+  , windowSetTitle
   , windowSetTransientFor
   )
 import GI.Pango (EllipsizeMode(EllipsizeModeMiddle), FontDescription)
@@ -514,6 +515,12 @@ createTerm handleKeyPress mvarTMState tmWinId = do
   void $ onWidgetKeyPressEvent scrolledWin $ handleKeyPress mvarTMState tmWinId
   void $ onWidgetButtonPressEvent vteTerm $ handleMousePress appWin vteTerm
   void $ onTerminalChildExited vteTerm $ \_ -> termExit notebookTab mvarTMState tmWinId
+
+  -- Set window title based on the shell
+  void $ onTerminalWindowTitleChanged vteTerm $ do
+    maybeTitle <- terminalGetWindowTitle vteTerm
+    let title = fromMaybe "Termonad" maybeTitle
+    windowSetTitle appWin title
 
   -- Underline URLs so that the user can see they are right-clickable.
   --
